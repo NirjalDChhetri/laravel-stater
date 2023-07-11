@@ -14,7 +14,7 @@ class StudentApiController extends Controller
     public function index()
     {
         $students = Student::all();
-        return response()->json(["status" => 200, "data" => $students, "message" => "Student Fetched sucwecessfully"]);
+        return response()->json(["status" => 200, "data" => $students, "message" => "Student Fetched successfully"]);
     }
 
 
