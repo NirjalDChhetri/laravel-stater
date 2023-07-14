@@ -3,23 +3,50 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Todo;
+use App\Http\Requests\Todo\StoreTodoRequest;
+use App\Http\Requests\Todo\UpdateTodoRequest;
+use App\Interfaces\TodoRepositoryInterface;
+use Exception;
 use Illuminate\Http\Request;
+
+use function PHPUnit\Framework\throwException;
 
 class TodoController extends Controller
 {
+    private $todoRepository;
+
+    public function __construct(TodoRepositoryInterface $todoRepository)
+    {
+        $this->todoRepository = $todoRepository;
+    }
     public function index()
     {
-        $todos = Todo::all();
-        return response()->json(["status" => 200, "data" => $todos, "message" => "Todo list Fetched successfully"]);
+        $todos = $this->todoRepository->getAll();
+        return response()->json([
+            "status" => "success",
+            "statusCode" => 200,
+            "data" => $todos,
+            "message" => "Todo list Fetched successfully"
+        ]);
     }
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTodoRequest $request)
     {
-        $todo = Todo::create($request->all());
-        return response()->json(["status"=> 200, "data"=> $todo, "message" => "Todo created Successfully"]);
+        try {
+            $todo = $this->todoRepository->create($request->validated());
+            return response()->json([
+                "status" => "success",
+                "statusCode" => 200,
+                "data" => $todo,
+                "message" => "Todo created Successfully"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -27,25 +54,57 @@ class TodoController extends Controller
      */
     public function show(string $id)
     {
-        $todo = Todo::findOrFail($id);
-        return response()->json(["status"=>200, "data"=>$todo, "message"=>"Todo fetched by id"]);
+        try {
+            $todo = $this->todoRepository->getById($id);
+            return response()->json([
+                "status" => "success",
+                "statusCode" => 200,
+                "data" => $todo,
+                "message" => "Todo fetched by id successfully"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ]);
+        }
     }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateTodoRequest $request, string $id)
     {
-        $todo = Todo::findOrFail($id);
-        $todo->update($request->all());
-        return response()->json(["status"=>200, "data"=>$todo, "message"=>"Todo updated Successfully"]);
+        
+        try {
+            $todo = $this->todoRepository->update($id, $request->validated());
+            return response()->json([
+                "status" => 200,
+                "data" => $todo,
+                "message" => "Todo updated Successfully"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ]);
+        }
     }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $todo = Todo::findOrFail($id);
-        $todo->delete();
-        return response()->json(["status"=>200, "data"=>$todo, "message"=>"Todo deleted Successfully"]);
+        try {
+            $todo = $this->todoRepository->delete($id);
+            return response()->json([
+                "status" => "success",
+                "statusCode" => 200,
+                "data" => $todo,
+                "message" => "Todo deleted Successfully"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ]);
+        }
     }
 }
