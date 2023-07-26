@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\StudentApiController;
 use App\Http\Controllers\API\TodoController;
+use App\Http\Controllers\TestQueueEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -27,3 +28,6 @@ Route::resource("students", StudentApiController::class);
 
 Route::resource("todo", TodoController::class);
 //Route::post("todo123/{id}", 'App\Http\Controllers\Api\TodoController@update');
+
+//Jobs and Queue Examples:
+// Route::get('send-queue-email', [TestQueueEmail::class,'sendTestEmails']);
